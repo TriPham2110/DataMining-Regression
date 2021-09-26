@@ -121,6 +121,16 @@ class MultivariateRegression:
         self.y = None
         self.a = None       # (a0, a1, ..., ap)^T, a0 in place of b in model
 
+    def gradient(self):
+        n = len(self.X_norm)
+        derivative_wrt_a = np.array([0] * len(self.X.columns))     # Get 9 derivatives
+
+        for i in range(len(self.X.columns)):
+            derivative_wrt_a[i] = sum((-2) * self.X_norm[:, i] * (self.y - np.dot(self.a[i], np.transpose(self.X_norm[:, i]))))
+
+        derivative_wrt_a = (1/n) * derivative_wrt_a
+        return derivative_wrt_a
+
     def train(self, X, y, max_iteration=1000):
         self.max_iteration = max_iteration
         self.X = X
@@ -135,6 +145,10 @@ class MultivariateRegression:
         self.a = np.array([0] * p)
 
         for i in range(max_iteration):
-            y_i = np.dot(self.a, np.transpose(self.X_norm))
+            derivative_wrt_a = self.gradient()
 
+            # Calculate step sizes
+            step_size_a = self.learning_rate * derivative_wrt_a
 
+            # Calculate new slop and intercept
+            self.a = self.a - step_size_a   # an array of size 9 corresponding to 9 params
