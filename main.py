@@ -1,5 +1,5 @@
 from pandas import read_excel
-from regression import UnivariateRegression
+from regression import UnivariateRegression, MultivariateRegression
 
 
 def UnivariateFeature(X, y, col, learning_rate=0.01, max_iteration=100):
@@ -22,12 +22,15 @@ if __name__ == '__main__':
     '''
     Univariate regression for individual feature of Concrete Data
     '''
-    model1 = UnivariateFeature(X, y, col=0, learning_rate=0.1, max_iteration=100)
-    print(model1.MSE())
+    # model1 = UnivariateFeature(X, y, col=0, learning_rate=0.1, max_iteration=100)
+    # print(model1.MSE())
     # model2 = UnivariateFeature(X, y, col=1, learning_rate=0.1, max_iteration=100)
     # model3 = UnivariateFeature(X, y, col=2, learning_rate=0.1, max_iteration=100)
 
     # UnivariateRegression.subplot(model1, model2, model3, features=X.columns[0:3], target=dataset.columns[-1])
+
+    model = MultivariateRegression(learning_rate=0.01)
+    model.train(X, y, max_iteration=100)
 
     '''
     For comparison with scikit-learn

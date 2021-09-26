@@ -41,7 +41,7 @@ class UnivariateRegression:
     def train(self, X, y, max_iteration=1000):
         self.max_iteration = max_iteration
         self.X = X
-        self.X_norm = UnivariateRegression.normalize(X, 'univariate')
+        self.X_norm = normalize(X, 'univariate')
         self.y = y
 
         # initial slope and intercept
@@ -76,14 +76,6 @@ class UnivariateRegression:
         return mse
 
     @staticmethod
-    def normalize(X, datatype):
-        if isinstance(X, pd.DataFrame) or isinstance(X, pd.Series):
-            X = X.values
-        if datatype == 'univariate':
-            X = X.reshape(-1, 1)
-        return MinMaxScaler().fit_transform(X)
-
-    @staticmethod
     def subplot(model1, model2, model3, features, target):
         plt.subplot(2, 3, 1)
         plt.scatter(model1.X, model1.y)
@@ -105,3 +97,44 @@ class UnivariateRegression:
 
         plt.get_current_fig_manager().window.state('zoomed')
         plt.show()
+
+
+def normalize(X, datatype):
+    if isinstance(X, pd.DataFrame) or isinstance(X, pd.Series):
+        X = X.values
+    if datatype == 'univariate':
+        X = X.reshape(-1, 1)
+        return MinMaxScaler().fit_transform(X)
+    if datatype == 'multivariate':
+        return MinMaxScaler().fit_transform(X)
+
+
+class MultivariateRegression:
+
+    def __init__(self, learning_rate=0.01, random_state=42):
+        self.learning_rate = learning_rate
+        self.random_state = random_state
+        np.random.seed(self.random_state)
+        self.max_iteration = None
+        self.X = None       # original X (vector of features with length p)
+        self.X_norm = None  # normalized X
+        self.y = None
+        self.a = None       # (a0, a1, ..., ap)^T, a0 in place of b in model
+
+    def train(self, X, y, max_iteration=1000):
+        self.max_iteration = max_iteration
+        self.X = X
+        self.X_norm = normalize(X, 'multivariate')
+
+        # add bias term to input x and x_norm
+        self.X.insert(loc=0, column='Bias term', value=1)
+        self.X_norm = np.append([[1.]] * (len(X)), self.X_norm, axis=1)
+
+        self.y = y
+        p = len(X.columns)
+        self.a = np.array([0] * p)
+
+        for i in range(max_iteration):
+            y_i = np.dot(self.a, np.transpose(self.X_norm))
+
+
