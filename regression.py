@@ -5,7 +5,7 @@ Ref: https://www.youtube.com/watch?v=sDv4f4s2SB8 (Gradient Descent step-by-step 
 
 import numpy as np
 import pandas as pd
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import MinMaxScaler
 import matplotlib.pyplot as plt
 
 
@@ -16,7 +16,8 @@ class UnivariateRegression:
         self.random_state = random_state
         np.random.seed(self.random_state)
         self.max_iteration = None
-        self.X = None
+        self.X = None       # original X
+        self.X_norm = None  # normalized X
         self.y = None
 
         # make m a list of slopes and b a list of intercepts to store results
@@ -24,13 +25,13 @@ class UnivariateRegression:
         self.b = []
 
     def gradient(self, index):
-        n = len(self.X)
+        n = len(self.X_norm)
         derivative_wrt_m = 0
         derivative_wrt_b = 0
 
         for i in range(n):
-            derivative_wrt_m = derivative_wrt_m + (-2) * self.X[i] * (self.y[i] - (self.m[index] * self.X[i] + self.b[index]))
-            derivative_wrt_b = derivative_wrt_b + (-2) * (self.y[i] - (self.m[index] * self.X[i] + self.b[index]))
+            derivative_wrt_m = derivative_wrt_m + (-2) * self.X_norm[i] * (self.y[i] - (self.m[index] * self.X_norm[i] + self.b[index]))
+            derivative_wrt_b = derivative_wrt_b + (-2) * (self.y[i] - (self.m[index] * self.X_norm[i] + self.b[index]))
 
         derivative_wrt_m = (1/n) * derivative_wrt_m
         derivative_wrt_b = (1/n) * derivative_wrt_b
@@ -39,7 +40,8 @@ class UnivariateRegression:
 
     def train(self, X, y, max_iteration=1000):
         self.max_iteration = max_iteration
-        self.X = UnivariateRegression.normalize(X, 'univariate')
+        self.X = X
+        self.X_norm = UnivariateRegression.normalize(X, 'univariate')
         self.y = y
 
         # initial slope and intercept
@@ -58,9 +60,11 @@ class UnivariateRegression:
             self.m.append(self.m[i] - step_size_m)
             self.b.append(self.b[i] - step_size_b)
 
-    def plot(self):
+    def plot(self, feature, target):
         plt.scatter(self.X, self.y)
-        plt.plot(self.X, self.m[-1] * self.X + self.b[-1], c='red')
+        plt.plot(self.X, self.m[-1] * self.X_norm + self.b[-1], c='red')
+        plt.xlabel(feature)
+        plt.ylabel(target)
         plt.show()
 
     @staticmethod
@@ -69,4 +73,27 @@ class UnivariateRegression:
             X = X.values
         if datatype == 'univariate':
             X = X.reshape(-1, 1)
-        return StandardScaler().fit_transform(X)
+        return MinMaxScaler().fit_transform(X)
+
+    @staticmethod
+    def subplot(model1, model2, model3, features, target):
+        plt.subplot(2, 3, 1)
+        plt.scatter(model1.X, model1.y)
+        plt.plot(model1.X, model1.m[-1] * model1.X_norm + model1.b[-1], c='red')
+        plt.xlabel(features[0])
+        plt.ylabel(target)
+
+        plt.subplot(2, 3, 2)
+        plt.scatter(model2.X, model2.y)
+        plt.plot(model2.X, model2.m[-1] * model2.X_norm + model2.b[-1], c='red')
+        plt.xlabel(features[1])
+        plt.ylabel(target)
+
+        plt.subplot(2, 3, 3)
+        plt.scatter(model3.X, model3.y)
+        plt.plot(model3.X, model3.m[-1] * model3.X_norm + model3.b[-1], c='red')
+        plt.xlabel(features[2])
+        plt.ylabel(target)
+
+        plt.get_current_fig_manager().window.state('zoomed')
+        plt.show()
