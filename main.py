@@ -22,21 +22,25 @@ if __name__ == '__main__':
     '''
     Univariate regression for individual feature of Concrete Data
     '''
-    # model1 = UnivariateFeature(X, y, col=0, learning_rate=0.1, max_iteration=100)
+    model1 = UnivariateFeature(X, y, col=0, learning_rate=0.1, max_iteration=100)
+    print(model1.MSE())
     # model2 = UnivariateFeature(X, y, col=1, learning_rate=0.1, max_iteration=100)
-    model3 = UnivariateFeature(X, y, col=2, learning_rate=0.1, max_iteration=100)
+    # model3 = UnivariateFeature(X, y, col=2, learning_rate=0.1, max_iteration=100)
 
     # UnivariateRegression.subplot(model1, model2, model3, features=X.columns[0:3], target=dataset.columns[-1])
 
     '''
     For comparison with scikit-learn
     from sklearn.linear_model import LinearRegression
+    from sklearn.metrics import mean_squared_error
     import matplotlib.pyplot as plt
     test = LinearRegression()
-    X_ = dataset.iloc[:, 2].values.reshape(-1, 1)
+    X_ = dataset.iloc[:, 0].values.reshape(-1, 1)
     test.fit(X_, y)
     plt.scatter(X_, y)
     plt.plot(X_, test.coef_ * X_ + test.intercept_, c='green')
     plt.show()
+    mse_scikit = mean_squared_error(y, test.coef_ * X_ + test.intercept_)
+    print(mse_scikit)
     '''
 

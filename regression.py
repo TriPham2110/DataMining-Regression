@@ -67,6 +67,14 @@ class UnivariateRegression:
         plt.ylabel(target)
         plt.show()
 
+    def MSE(self):
+        mse = 0
+        n = len(self.y)
+        for i in range(n):
+            mse = mse + (self.y[i] - (self.m[-1] * self.X_norm[i] + self.b[-1]))**2
+        mse = (1/n) * mse
+        return mse
+
     @staticmethod
     def normalize(X, datatype):
         if isinstance(X, pd.DataFrame) or isinstance(X, pd.Series):
