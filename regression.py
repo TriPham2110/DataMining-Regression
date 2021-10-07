@@ -75,6 +75,15 @@ class UnivariateRegression:
         mse = (1/n) * mse
         return mse
 
+    def test(self, X_test):
+        X_test_norm = normalize(X_test, 'univariate')
+        print(len(X_test_norm))
+        y_pred = []
+        for i in range(len(X_test_norm)):
+            pred = self.m[-1] * X_test_norm[i] + self.b[-1]
+            y_pred.append(pred)
+        return y_pred
+
     @staticmethod
     def subplot(model1, model2, model3, features, target):
         plt.subplot(2, 3, 1)
@@ -107,6 +116,13 @@ def normalize(X, datatype):
         return MinMaxScaler().fit_transform(X)
     if datatype == 'multivariate':
         return MinMaxScaler().fit_transform(X)
+
+
+def MSE_test(y_pred, y_true):
+    y_pred = np.array(y_pred).flatten()
+    n = len(y_true)
+    mse = np.sum((y_pred - y_true) ** 2) / n
+    return mse
 
 
 class MultivariateRegression:
@@ -166,3 +182,8 @@ class MultivariateRegression:
         n = len(self.y)
         mse = np.sum((self.y - np.dot(self.a, np.transpose(self.X_norm))) ** 2) / n
         return mse
+
+    def test(self, X_test):
+        X_test_norm = normalize(X_test, 'multivariate')
+        X_test_norm = np.append([[1.]] * (len(X_test_norm)), X_test_norm, axis=1)
+        return np.dot(self.a, np.transpose(X_test_norm))
