@@ -92,24 +92,28 @@ class UnivariateRegression:
         print("############ ------------ ################\n")
 
     @staticmethod
-    def subplot(model1, model2, model3, features, target):
-        plt.subplot(2, 3, 1)
-        plt.scatter(model1.X, model1.y)
-        plt.plot(model1.X, model1.m[-1] * model1.X_norm + model1.b[-1], c='red')
-        plt.xlabel(features[0])
-        plt.ylabel(target)
+    def subplot(model1=None, model2=None, model3=None, features=None, target=None):
+        if model1:
+            plt.subplot(2, 3, 1)
+            plt.scatter(model1.X, model1.y)
+            plt.plot(model1.X, model1.m[-1] * model1.X_norm + model1.b[-1], c='red')
+            plt.xlabel(features[0])
+            plt.ylabel(target)
 
-        plt.subplot(2, 3, 2)
-        plt.scatter(model2.X, model2.y)
-        plt.plot(model2.X, model2.m[-1] * model2.X_norm + model2.b[-1], c='red')
-        plt.xlabel(features[1])
-        plt.ylabel(target)
+        if model2:
+            plt.subplot(2, 3, 2)
+            plt.scatter(model2.X, model2.y)
+            plt.plot(model2.X, model2.m[-1] * model2.X_norm + model2.b[-1], c='red')
+            plt.xlabel(features[1])
+            plt.ylabel(target)
+            plt.suptitle('Univariate regression plots for individual features (training data)', fontsize=18)
 
-        plt.subplot(2, 3, 3)
-        plt.scatter(model3.X, model3.y)
-        plt.plot(model3.X, model3.m[-1] * model3.X_norm + model3.b[-1], c='red')
-        plt.xlabel(features[2])
-        plt.ylabel(target)
+        if model3:
+            plt.subplot(2, 3, 3)
+            plt.scatter(model3.X, model3.y)
+            plt.plot(model3.X, model3.m[-1] * model3.X_norm + model3.b[-1], c='red')
+            plt.xlabel(features[2])
+            plt.ylabel(target)
 
         plt.get_current_fig_manager().window.state('zoomed')
         plt.show()
