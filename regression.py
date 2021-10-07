@@ -73,16 +73,23 @@ class UnivariateRegression:
         for i in range(n):
             mse = mse + (self.y[i] - (self.m[-1] * self.X_norm[i] + self.b[-1]))**2
         mse = (1/n) * mse
-        return mse
+        return mse[0]
 
     def test(self, X_test):
         X_test_norm = normalize(X_test, 'univariate')
-        print(len(X_test_norm))
         y_pred = []
         for i in range(len(X_test_norm)):
             pred = self.m[-1] * X_test_norm[i] + self.b[-1]
             y_pred.append(pred)
         return y_pred
+
+    def info(self, name, y_pred, y_true):
+        print("############ Univariate regression for feature "+ name +" ################")
+        print("Max iterations:", self.max_iteration)
+        print("Learning rate:", self.learning_rate)
+        print("MSE training:", self.MSE())
+        print("MSE testing:", MSE_test(y_pred, y_true))
+        print("############ ------------ ################\n")
 
     @staticmethod
     def subplot(model1, model2, model3, features, target):
@@ -187,3 +194,11 @@ class MultivariateRegression:
         X_test_norm = normalize(X_test, 'multivariate')
         X_test_norm = np.append([[1.]] * (len(X_test_norm)), X_test_norm, axis=1)
         return np.dot(self.a, np.transpose(X_test_norm))
+
+    def info(self, y_pred, y_true):
+        print("############ Multivariate regression for all features ################")
+        print("Max iterations:", self.max_iteration)
+        print("Learning rate:", self.learning_rate)
+        print("MSE training:", self.MSE())
+        print("MSE testing:", MSE_test(y_pred, y_true))
+        print("############ ------------ ################\n")
