@@ -28,22 +28,26 @@ if __name__ == '__main__':
     # model3 = UnivariateFeature(X, y, col=2, learning_rate=0.1, max_iteration=100)
 
     # UnivariateRegression.subplot(model1, model2, model3, features=X.columns[0:3], target=dataset.columns[-1])
-
-    model = MultivariateRegression(learning_rate=0.01)
+    
+    model = MultivariateRegression(learning_rate=0.1)
     model.train(X, y, max_iteration=100)
+    print(model.a, model.MSE())
 
-    '''
-    For comparison with scikit-learn
+    # '''
+    # For comparison with scikit-learn
     from sklearn.linear_model import LinearRegression
     from sklearn.metrics import mean_squared_error
     import matplotlib.pyplot as plt
     test = LinearRegression()
     X_ = dataset.iloc[:, 0].values.reshape(-1, 1)
-    test.fit(X_, y)
-    plt.scatter(X_, y)
-    plt.plot(X_, test.coef_ * X_ + test.intercept_, c='green')
-    plt.show()
-    mse_scikit = mean_squared_error(y, test.coef_ * X_ + test.intercept_)
-    print(mse_scikit)
-    '''
+    test.fit(X, y)
+    print(test.coef_, test.intercept_)
+    print('Mean squared error: %.2f'
+          % mean_squared_error(y, X.dot(test.coef_) + test.intercept_))
+    # plt.scatter(X_all, y)
+    # plt.plot(X_all, test.coef_ * X_all + test.intercept_, c='green')
+    # plt.show()
+    # mse_scikit = mean_squared_error(y, test.coef_ * X_ + test.intercept_)
+    # print(mse_scikit)
+    # '''
 

@@ -123,13 +123,22 @@ class MultivariateRegression:
 
     def gradient(self):
         n = len(self.X_norm)
-        derivative_wrt_a = np.array([0] * len(self.X.columns))     # Get 9 derivatives
 
-        for i in range(len(self.X.columns)):
-            derivative_wrt_a[i] = sum((-2) * self.X_norm[:, i] * (self.y - np.dot(self.a[i], np.transpose(self.X_norm[:, i]))))
+        dot_products = np.dot(self.a, np.transpose(self.X_norm))
 
-        derivative_wrt_a = (1/n) * derivative_wrt_a
-        return derivative_wrt_a
+        derivative_wrt_as = []
+        for i in range(n):
+            derivative_wrt_a = []
+            for j in range(len(self.X.columns)):
+                derivative_wrt_a.append(0)
+            derivative_wrt_as.append(derivative_wrt_a)
+
+        for i in range(n):
+            for j in range(len(self.X.columns)):
+                derivative_wrt_as[i][j] = (-2) * self.X_norm[i][j] * (self.y[i] - dot_products[i])
+
+        derivative_wrt_as = (1/n) * np.sum(derivative_wrt_as, axis=0)
+        return derivative_wrt_as
 
     def train(self, X, y, max_iteration=1000):
         self.max_iteration = max_iteration
@@ -139,8 +148,8 @@ class MultivariateRegression:
         # add bias term to input x and x_norm
         self.X.insert(loc=0, column='Bias term', value=1)
         self.X_norm = np.append([[1.]] * (len(X)), self.X_norm, axis=1)
-
         self.y = y
+
         p = len(X.columns)
         self.a = np.array([0] * p)
 
@@ -152,3 +161,8 @@ class MultivariateRegression:
 
             # Calculate new slop and intercept
             self.a = self.a - step_size_a   # an array of size 9 corresponding to 9 params
+
+    def MSE(self):
+        n = len(self.y)
+        mse = np.sum((self.y - np.dot(self.a, np.transpose(self.X_norm))) ** 2) / n
+        return mse
