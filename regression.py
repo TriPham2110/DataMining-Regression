@@ -20,18 +20,19 @@ class UnivariateRegression:
         self.X_norm = None  # normalized X
         self.y = None
 
-        # make m a list of slopes and b a list of intercepts to store results
+        # list of slopes, list of intercepts, list of costs (each index corresponds to an iteration)
         self.m = []
         self.b = []
+        self.C = []
 
-    def gradient(self, index):
+    def gradient(self, iter):
         n = len(self.X_norm)
         derivative_wrt_m = 0
         derivative_wrt_b = 0
 
         for i in range(n):
-            derivative_wrt_m = derivative_wrt_m + (-2) * self.X_norm[i] * (self.y[i] - (self.m[index] * self.X_norm[i] + self.b[index]))
-            derivative_wrt_b = derivative_wrt_b + (-2) * (self.y[i] - (self.m[index] * self.X_norm[i] + self.b[index]))
+            derivative_wrt_m = derivative_wrt_m + (-2) * self.X_norm[i] * (self.y[i] - (self.m[iter] * self.X_norm[i] + self.b[iter]))
+            derivative_wrt_b = derivative_wrt_b + (-2) * (self.y[i] - (self.m[iter] * self.X_norm[i] + self.b[iter]))
 
         derivative_wrt_m = (1/n) * derivative_wrt_m
         derivative_wrt_b = (1/n) * derivative_wrt_b
@@ -44,9 +45,10 @@ class UnivariateRegression:
         self.X_norm = normalize(X, 'univariate')
         self.y = y
 
-        # initial slope and intercept
+        # initial slope, intercept, and cost
         self.m.append(1)
         self.b.append(0)
+        self.C.append(0)
 
         for i in range(max_iteration):
             # Plug slope and intercept into the gradient
@@ -57,8 +59,19 @@ class UnivariateRegression:
             step_size_b = self.learning_rate * derivative_wrt_b
 
             # Calculate new slop and intercept
-            self.m.append(self.m[i] - step_size_m)
-            self.b.append(self.b[i] - step_size_b)
+            new_m = self.m[i] - step_size_m
+            new_b = self.b[i] - step_size_b
+
+            # check if the change in the objective function between steps is negligeable
+            n = len(self.y)
+            temp_C = (np.sum(np.array(self.y) - (new_m * np.array(self.X_norm) + new_b)) ** 2) / n
+            if abs(self.C[-1] - temp_C) < 1e-5:
+                print("Change in the objective function between steps is negligeable starting at iteration ", i)
+                break
+            else:
+                self.C.append(temp_C)
+                self.m.append(new_m)
+                self.b.append(new_b)
 
     def plot(self, feature, target):
         plt.scatter(self.X, self.y)
@@ -147,8 +160,9 @@ class MultivariateRegression:
         self.X_norm = None  # normalized X
         self.y = None
         self.a = None       # (a0, a1, ..., ap)^T, a0 in place of b in model
+        self.C = []
 
-    def gradient(self):
+    def gradient(self, iter):
         n = len(self.X_norm)
 
         dot_products = np.dot(self.a, np.transpose(self.X_norm))
@@ -179,15 +193,26 @@ class MultivariateRegression:
 
         p = len(X.columns)
         self.a = np.array([0] * p)
+        self.C.append(0)
 
         for i in range(max_iteration):
-            derivative_wrt_a = self.gradient()
+            derivative_wrt_a = self.gradient(i)
 
             # Calculate step sizes
             step_size_a = self.learning_rate * derivative_wrt_a
 
-            # Calculate new slop and intercept
-            self.a = self.a - step_size_a   # an array of size 9 corresponding to 9 params
+            # Calculate new params (an array of size 9 corresponding to 9 params)
+            new_a = self.a - step_size_a
+
+            # check if the change in the objective function between steps is negligeable
+            n = len(self.y)
+            temp_C = (np.sum(np.array(self.y) - np.dot(new_a, np.transpose(self.X_norm))) ** 2) / n
+            if abs(self.C[-1] - temp_C) < 1e-5:
+                print("Change in the objective function between steps is negligeable starting at iteration ", i)
+                break
+            else:
+                self.C.append(temp_C)
+                self.a = new_a
 
     def MSE(self):
         n = len(self.y)
@@ -196,7 +221,7 @@ class MultivariateRegression:
 
     def test(self, X_test):
         X_test_norm = normalize(X_test, 'multivariate')
-        X_test_norm = np.append([[1.]] * (len(X_test_norm)), X_test_norm, axis=1)
+        X_test_norm = np.append([[1.]] * (len(X_test)), X_test_norm, axis=1)
         return np.dot(self.a, np.transpose(X_test_norm))
 
     def info(self, y_pred, y_true):
