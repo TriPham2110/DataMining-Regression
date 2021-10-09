@@ -50,26 +50,51 @@ if __name__ == '__main__':
     '''
     Multivariate regression for all features of Concrete Data
     '''
-    model = MultivariateRegression(learning_rate=0.1)
-    model.train(X_train, y_train, max_iteration=100)
-    y_pred = model.test(X_test)
-    model.info(y_pred=y_pred, y_true=y_test)
+    model9 = MultivariateRegression(learning_rate=0.1)
+    model9.train(X_train, y_train, max_iteration=100)
+    y_pred = model9.test(X_test)
+    model9.info(y_pred=y_pred, y_true=y_test)
+
+    print("############ MSE results for all models on training data ################")
+    print("Model 1:", model1.MSE())
+    print("Model 2:", model2.MSE())
+    print("Model 3:", model3.MSE())
+    print("Model 4:", model4.MSE())
+    print("Model 5:", model5.MSE())
+    print("Model 6:", model6.MSE())
+    print("Model 7:", model7.MSE())
+    print("Model 8:", model8.MSE())
+    print("Model 9:", model9.MSE())
+    print("############ ------------------------------------------- ################\n")
+
+    print("############ MSE results for all models on testing data ################")
+    print("Model 1:", regression.MSE_test(model1.test(X_test.iloc[:, 0]), y_test))
+    print("Model 2:", regression.MSE_test(model2.test(X_test.iloc[:, 1]), y_test))
+    print("Model 3:", regression.MSE_test(model3.test(X_test.iloc[:, 2]), y_test))
+    print("Model 4:", regression.MSE_test(model4.test(X_test.iloc[:, 3]), y_test))
+    print("Model 5:", regression.MSE_test(model5.test(X_test.iloc[:, 4]), y_test))
+    print("Model 6:", regression.MSE_test(model6.test(X_test.iloc[:, 5]), y_test))
+    print("Model 7:", regression.MSE_test(model7.test(X_test.iloc[:, 6]), y_test))
+    print("Model 8:", regression.MSE_test(model8.test(X_test.iloc[:, 7]), y_test))
+    print("Model 9:", regression.MSE_test(model9.test(X_test), y_test))
+    print("############ ------------------------------------------ ################\n")
 
     '''
     # For comparison with scikit-learn
     from sklearn.linear_model import LinearRegression
     from sklearn.metrics import mean_squared_error
     import matplotlib.pyplot as plt
-    test = LinearRegression()
-    X_ = dataset.iloc[:, 0].values.reshape(-1, 1)
-    test.fit(X, y)
-    print(test.coef_, test.intercept_)
-    print('Mean squared error: %.2f'
-          % mean_squared_error(y, X.dot(test.coef_) + test.intercept_))
+    scikit_model = LinearRegression()
+    # x_train = X_train.iloc[:, 0].values.reshape(-1, 1)    # univarariate
+    scikit_model.fit(X_train, y_train)
     # plt.scatter(X_all, y)
     # plt.plot(X_all, test.coef_ * X_all + test.intercept_, c='green')
     # plt.show()
-    # mse_scikit = mean_squared_error(y, test.coef_ * X_ + test.intercept_)
-    # print(mse_scikit)
+    # x_test = X_test.iloc[:, 0].values.reshape(-1, 1)        # univarariate
+    # train_mse = mean_squared_error(y_train, scikit_model.coef_ * x_train + scikit_model.intercept_)
+    # test_mse = mean_squared_error(y_test, scikit_model.coef_ * x_test + scikit_model.intercept_)
+    train_mse = mean_squared_error(y_train, scikit_model.predict(X_train))
+    test_mse = mean_squared_error(y_test, scikit_model.predict(X_test))
+    print(train_mse, ', ', test_mse)
     '''
 
