@@ -12,8 +12,8 @@ def UnivariateFeature(X_train, y_train, X_test, y_test, col, learning_rate=0.01,
     model.train(univariate_feature, y_train, max_iteration=max_iteration)
     y_pred = model.test(X_test.iloc[:, col])
     model.info(name=X.columns[col], y_pred=y_pred, y_true=y_test)
-    # individual plot for univariate regression of a feature
-    # model.plot(feature=X.columns[0], target=dataset.columns[-1])
+    # uncomment the below line for individual plot for univariate regression of a feature
+    # model.plot(feature=X.columns[col], target=dataset.columns[-1])
     return model
 
 
@@ -43,9 +43,9 @@ if __name__ == '__main__':
     model8 = UnivariateFeature(X_train, y_train, X_test, y_test, col=7, learning_rate=0.1, max_iteration=100)
 
     # group of 3 plots for univariate regression of corresponding model obtained above
-    # UnivariateRegression.subplot(model1, model2, model3, features=X.columns[0:3], target=dataset.columns[-1])
-    # UnivariateRegression.subplot(model4, model5, model6, features=X.columns[3:6], target=dataset.columns[-1])
-    # UnivariateRegression.subplot(model7, model8, features=X.columns[6:], target=dataset.columns[-1])
+    UnivariateRegression.subplot(model1, model2, model3, features=X.columns[0:3], target=dataset.columns[-1])
+    UnivariateRegression.subplot(model4, model5, model6, features=X.columns[3:6], target=dataset.columns[-1])
+    UnivariateRegression.subplot(model7, model8, features=X.columns[6:], target=dataset.columns[-1])
 
     '''
     Multivariate regression for all features of Concrete Data
@@ -54,6 +54,18 @@ if __name__ == '__main__':
     model9.train(X_train, y_train, max_iteration=100)
     y_pred = model9.test(X_test)
     model9.info(y_pred=y_pred, y_true=y_test)
+
+    print("############ Parameters learned for all models ################")
+    print("Model 1: m =", model1.m[-1][0], ", b =", model1.b[-1][0])
+    print("Model 2: m =", model2.m[-1][0], ", b =", model2.b[-1][0])
+    print("Model 3: m =", model3.m[-1][0], ", b =", model3.b[-1][0])
+    print("Model 4: m =", model4.m[-1][0], ", b =", model4.b[-1][0])
+    print("Model 5: m =", model5.m[-1][0], ", b =", model5.b[-1][0])
+    print("Model 6: m =", model6.m[-1][0], ", b =", model6.b[-1][0])
+    print("Model 7: m =", model7.m[-1][0], ", b =", model7.b[-1][0])
+    print("Model 8: m =", model8.m[-1][0], ", b =", model8.b[-1][0])
+    print("Model 9: a =", model9.a, "(first value represents bias b)")
+    print("############ --------------------------------- ################\n")
 
     print("############ MSE results for all models on training data ################")
     print("Model 1:", model1.MSE())

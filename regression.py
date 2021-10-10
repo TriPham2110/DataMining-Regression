@@ -62,14 +62,14 @@ class UnivariateRegression:
             new_m = self.m[i] - step_size_m
             new_b = self.b[i] - step_size_b
 
-            # check if the change in the objective function between steps is negligeable
+            # check if the change in the cost function between consecutive iteration is negligible
             n = len(self.y)
-            temp_C = (np.sum(np.array(self.y) - (new_m * np.array(self.X_norm) + new_b)) ** 2) / n
-            if abs(self.C[-1] - temp_C) < 1e-5:
+            new_C = (np.sum(np.array(self.y) - (new_m * np.array(self.X_norm) + new_b)) ** 2) / n
+            if abs(self.C[i] - new_C) < 1e-5:
                 print("Change in the objective function between steps is negligeable starting at iteration ", i)
                 break
             else:
-                self.C.append(temp_C)
+                self.C.append(new_C)
                 self.m.append(new_m)
                 self.b.append(new_b)
 
@@ -78,6 +78,7 @@ class UnivariateRegression:
         plt.plot(self.X, self.m[-1] * self.X_norm + self.b[-1], c='red')
         plt.xlabel(feature)
         plt.ylabel(target)
+        plt.title('Univariate regression plot (training data)')
         plt.show()
 
     def MSE(self):
@@ -97,7 +98,7 @@ class UnivariateRegression:
         return y_pred
 
     def info(self, name, y_pred, y_true):
-        print("############ Univariate regression for feature "+ name +" ################")
+        print("############ Univariate regression for feature " + name + " ################")
         print("Max iterations:", self.max_iteration)
         print("Learning rate:", self.learning_rate)
         print("MSE training:", self.MSE())
@@ -204,14 +205,14 @@ class MultivariateRegression:
             # Calculate new params (an array of size 9 corresponding to 9 params)
             new_a = self.a - step_size_a
 
-            # check if the change in the objective function between steps is negligeable
+            # check if the change in the cost function between consecutive iteration is negligible
             n = len(self.y)
-            temp_C = (np.sum(np.array(self.y) - np.dot(new_a, np.transpose(self.X_norm))) ** 2) / n
-            if abs(self.C[-1] - temp_C) < 1e-5:
+            new_C = (np.sum(np.array(self.y) - np.dot(new_a, np.transpose(self.X_norm))) ** 2) / n
+            if abs(self.C[i] - new_C) < 1e-5:
                 print("Change in the objective function between steps is negligeable starting at iteration ", i)
                 break
             else:
-                self.C.append(temp_C)
+                self.C.append(new_C)
                 self.a = new_a
 
     def MSE(self):
