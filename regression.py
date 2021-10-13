@@ -152,16 +152,17 @@ def MSE_test(y_pred, y_true):
 
 class MultivariateRegression:
 
-    def __init__(self, learning_rate=0.01, random_state=42):
+    def __init__(self, learning_rate=0.01, random_state=42, degree=None):
         self.learning_rate = learning_rate
         self.random_state = random_state
         np.random.seed(self.random_state)
         self.max_iteration = None
-        self.X = None       # original X (vector of features with length p)
-        self.X_norm = None  # normalized X
+        self.X = None           # original X (vector of features)
+        self.X_norm = None      # normalized X
         self.y = None
-        self.a = None       # (a0, a1, ..., ap)^T, a0 in place of b in model
+        self.a = None           # (a0, a1, ..., ap)^T, a0 in place of b in model
         self.C = []
+        self.degree = degree    # currently only handles quadratic
 
     def gradient(self, iter):
         n = len(self.X_norm)
@@ -171,29 +172,37 @@ class MultivariateRegression:
         derivative_wrt_as = []
         for i in range(n):
             derivative_wrt_a = []
-            for j in range(len(self.X.columns)):
+            for j in range(len(self.X_norm[0])):
                 derivative_wrt_a.append(0)
             derivative_wrt_as.append(derivative_wrt_a)
 
+        # no need to worry about checking degree here
+        # since x_norm has been processed to include columns that contain results of x^2
         for i in range(n):
-            for j in range(len(self.X.columns)):
-                derivative_wrt_as[i][j] = (-2) * self.X_norm[i][j] * (self.y[i] - dot_products[i])
+            for j in range(len(self.X_norm[0])):
+                if j == 0:  # derivative wrt bias b (or param a0)
+                    derivative_wrt_as[i][j] = (-2) * (self.y[i] - dot_products[i])
+                else:
+                    derivative_wrt_as[i][j] = (-2) * self.X_norm[i][j] * (self.y[i] - dot_products[i])
 
         derivative_wrt_as = (1/n) * np.sum(derivative_wrt_as, axis=0)
         return derivative_wrt_as
 
     def train(self, X, y, max_iteration=1000):
         self.max_iteration = max_iteration
-        self.X = X
-        self.X_norm = normalize(X, 'multivariate')
+        X_copy = X.copy()
+        self.X = X_copy
 
-        # add bias term to input x and x_norm
-        self.X.insert(loc=0, column='Bias term', value=1)
-        self.X_norm = np.append([[1.]] * (len(X)), self.X_norm, axis=1)
+        if self.degree == 2:
+            self.X = np.append(X_copy.values, X_copy.values ** 2, axis=1)
+
+        # normalize x to x_norm and add bias term to input x_norm
+        self.X_norm = normalize(self.X, 'multivariate')
+        self.X_norm = np.append([[1.]] * (len(self.X_norm)), self.X_norm, axis=1)
         self.y = y
 
-        # p here contains all 9 parameters
-        p = len(X.columns)
+        # p here contains all parameters (9 for linear and 17 for quadratic)
+        p = len(self.X_norm[0])
         self.a = np.array([0] * p)
         self.C.append(0)
 
@@ -203,7 +212,7 @@ class MultivariateRegression:
             # Calculate step sizes
             step_size_a = self.learning_rate * derivative_wrt_a
 
-            # Calculate new params (an array of size 9 corresponding to 9 params)
+            # Calculate new params (an array of size p)
             new_a = self.a - step_size_a
 
             # check if the change in the cost function between consecutive iteration is negligible
@@ -222,8 +231,11 @@ class MultivariateRegression:
         return mse
 
     def test(self, X_test):
-        X_test_norm = normalize(X_test, 'multivariate')
-        X_test_norm = np.append([[1.]] * (len(X_test)), X_test_norm, axis=1)
+        X_test_copy = X_test.copy()
+        if self.degree == 2:
+            X_test_copy = np.append(X_test_copy.values, X_test_copy.values ** 2, axis=1)
+        X_test_norm = normalize(X_test_copy, 'multivariate')
+        X_test_norm = np.append([[1.]] * (len(X_test_norm)), X_test_norm, axis=1)
         return np.dot(self.a, np.transpose(X_test_norm))
 
     def info(self, y_pred, y_true):

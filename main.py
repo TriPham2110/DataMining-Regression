@@ -55,6 +55,11 @@ if __name__ == '__main__':
     y_pred = model9.test(X_test)
     model9.info(y_pred=y_pred, y_true=y_test)
 
+    model10 = MultivariateRegression(learning_rate=0.1, degree=2)
+    model10.train(X_train, y_train, max_iteration=100)
+    y_pred = model10.test(X_test)
+    model10.info(y_pred=y_pred, y_true=y_test)
+
     print("############ Parameters learned for all models ################")
     print("Model 1: m =", model1.m[-1][0], ", b =", model1.b[-1][0])
     print("Model 2: m =", model2.m[-1][0], ", b =", model2.b[-1][0])
@@ -65,6 +70,7 @@ if __name__ == '__main__':
     print("Model 7: m =", model7.m[-1][0], ", b =", model7.b[-1][0])
     print("Model 8: m =", model8.m[-1][0], ", b =", model8.b[-1][0])
     print("Model 9: a =", model9.a, "(first value represents bias b)")
+    print("Model 10: a =", model10.a, "(first value represents bias b)")
     print("############ --------------------------------- ################\n")
 
     print("############ MSE results for all models on training data ################")
@@ -77,6 +83,7 @@ if __name__ == '__main__':
     print("Model 7:", model7.MSE())
     print("Model 8:", model8.MSE())
     print("Model 9:", model9.MSE())
+    print("Model 10:", model10.MSE())
     print("############ ------------------------------------------- ################\n")
 
     print("############ MSE results for all models on testing data ################")
@@ -89,5 +96,6 @@ if __name__ == '__main__':
     print("Model 7:", regression.MSE_test(model7.test(X_test.iloc[:, 6]), y_test))
     print("Model 8:", regression.MSE_test(model8.test(X_test.iloc[:, 7]), y_test))
     print("Model 9:", regression.MSE_test(model9.test(X_test), y_test))
+    print("Model 10:", regression.MSE_test(model10.test(X_test), y_test))
     print("############ ------------------------------------------ ################\n")
 
