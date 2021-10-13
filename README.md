@@ -43,9 +43,9 @@ According to the plot shown above, when going through univariate model individua
 Out of the four, Cement shows the highest correlation with the concrete compressive strength. 
 This also matches our normal intuition. When we talk about concrete, a lot of the time we will be thinking about cement because it is an essential component in creating concrete.
 
-Additionally, we look at the learned parameters from all models (8 univariate for each feature and one multivariate for all features).
-There are correlations between the parameters learned for a feature in its univariate model and those for the corresponding feature in the multivariate model.
-The multivariate model also confirms that the four features above certainly hold more significance than the remaining ones.
+Additionally, we look at the learned parameters from all models (eight univariate models for each feature and two multivariate models for all features).
+There are correlations between the parameters learned for a feature in its univariate model and those for the corresponding feature in the multivariate models.
+The multivariate models also confirm that the four features above certainly hold more significance than the remaining features.
 
 For a more comprehensive view of the assignment, please consider looking at the report also included in this repository.
 
