@@ -62,7 +62,7 @@ class UnivariateRegression:
             new_m = self.m[i] - step_size_m
             new_b = self.b[i] - step_size_b
 
-            # check if the change in the cost function between consecutive iteration is negligible
+            # Check if the change in the cost function between consecutive iteration is negligible
             n = len(self.y)
             new_C = (np.sum(np.array(self.y) - (new_m * np.array(self.X_norm) + new_b)) ** 2) / n
             if abs(self.C[i] - new_C) < 1e-5:
@@ -176,7 +176,7 @@ class MultivariateRegression:
                 derivative_wrt_a.append(0)
             derivative_wrt_as.append(derivative_wrt_a)
 
-        # no need to worry about checking degree here
+        # No need to worry about checking degree here
         # since x_norm has been processed to include columns that contain results of x^2
         for i in range(n):
             for j in range(len(self.X_norm[0])):
@@ -191,19 +191,20 @@ class MultivariateRegression:
     def train(self, X, y, max_iteration=1000):
         self.max_iteration = max_iteration
         X_copy = X.copy()
-        self.X = X_copy
+        self.X = X_copy.values
 
         if self.degree == 2:
             self.X = np.append(X_copy.values, X_copy.values ** 2, axis=1)
 
         # normalize x to x_norm and add bias term to input x_norm
         self.X_norm = normalize(self.X, 'multivariate')
+        p = len(self.X_norm[0])
+
         self.X_norm = np.append([[1.]] * (len(self.X_norm)), self.X_norm, axis=1)
         self.y = y
 
-        # p here contains all parameters (9 for linear and 17 for quadratic)
-        p = len(self.X_norm[0])
-        self.a = np.array([0] * p)
+        # (p + 1) here contains all parameters (9 for linear and 17 for quadratic)
+        self.a = np.array([0] * (p + 1))
         self.C.append(0)
 
         for i in range(max_iteration):
@@ -212,10 +213,10 @@ class MultivariateRegression:
             # Calculate step sizes
             step_size_a = self.learning_rate * derivative_wrt_a
 
-            # Calculate new params (an array of size p)
+            # Calculate new params
             new_a = self.a - step_size_a
 
-            # check if the change in the cost function between consecutive iteration is negligible
+            # Check if the change in the cost function between consecutive iteration is negligible
             n = len(self.y)
             new_C = (np.sum(np.array(self.y) - np.dot(new_a, np.transpose(self.X_norm))) ** 2) / n
             if abs(self.C[i] - new_C) < 1e-5:
@@ -239,7 +240,10 @@ class MultivariateRegression:
         return np.dot(self.a, np.transpose(X_test_norm))
 
     def info(self, y_pred, y_true):
-        print("############ Multivariate regression for all features ################")
+        if self.degree == 2:
+            print("############ Multivariate quadratic regression for all features ################")
+        else:
+            print("############ Multivariate linear regression for all features ################")
         print("Max iterations:", self.max_iteration)
         print("Learning rate:", self.learning_rate)
         print("MSE training:", self.MSE())
