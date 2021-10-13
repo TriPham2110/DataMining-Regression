@@ -192,6 +192,7 @@ class MultivariateRegression:
         self.X_norm = np.append([[1.]] * (len(X)), self.X_norm, axis=1)
         self.y = y
 
+        # p here contains all 9 parameters
         p = len(X.columns)
         self.a = np.array([0] * p)
         self.C.append(0)

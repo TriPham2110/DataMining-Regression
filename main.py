@@ -91,22 +91,3 @@ if __name__ == '__main__':
     print("Model 9:", regression.MSE_test(model9.test(X_test), y_test))
     print("############ ------------------------------------------ ################\n")
 
-    '''
-    # For comparison with scikit-learn
-    from sklearn.linear_model import LinearRegression
-    from sklearn.metrics import mean_squared_error
-    import matplotlib.pyplot as plt
-    scikit_model = LinearRegression()
-    # x_train = X_train.iloc[:, 0].values.reshape(-1, 1)    # univarariate
-    scikit_model.fit(X_train, y_train)
-    # plt.scatter(X_all, y)
-    # plt.plot(X_all, test.coef_ * X_all + test.intercept_, c='green')
-    # plt.show()
-    # x_test = X_test.iloc[:, 0].values.reshape(-1, 1)        # univarariate
-    # train_mse = mean_squared_error(y_train, scikit_model.coef_ * x_train + scikit_model.intercept_)
-    # test_mse = mean_squared_error(y_test, scikit_model.coef_ * x_test + scikit_model.intercept_)
-    train_mse = mean_squared_error(y_train, scikit_model.predict(X_train))
-    test_mse = mean_squared_error(y_test, scikit_model.predict(X_test))
-    print(train_mse, ', ', test_mse)
-    '''
-
