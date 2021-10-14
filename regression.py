@@ -81,6 +81,7 @@ class UnivariateRegression:
         plt.title('Univariate regression plot (training data)')
         plt.show()
 
+    # MSE after training
     def MSE(self):
         mse = 0
         n = len(self.y)
@@ -143,6 +144,7 @@ def normalize(X, datatype):
         return MinMaxScaler().fit_transform(X)
 
 
+# MSE for test data
 def MSE_test(y_pred, y_true):
     y_pred = np.array(y_pred).flatten()
     n = len(y_true)
@@ -150,9 +152,20 @@ def MSE_test(y_pred, y_true):
     return mse
 
 
+def closed_form(X_train, y_train, X_test, y_test):
+    X_train = X_train.values
+    XTX_inverse = np.linalg.inv(np.dot(np.transpose(X_train), X_train))
+    closed_form_sol = np.dot(XTX_inverse, np.transpose(X_train)).dot(y_train)
+    mse_train = np.sum((y_train - np.dot(closed_form_sol, np.transpose(X_train))) ** 2) / len(y_train)
+
+    X_test = X_test.values
+    mse_test = np.sum((y_test - np.dot(closed_form_sol, np.transpose(X_test))) ** 2) / len(y_test)
+    return closed_form_sol, mse_train, mse_test
+
+
 class MultivariateRegression:
 
-    def __init__(self, learning_rate=0.01, random_state=42, degree=None):
+    def __init__(self, learning_rate=0.01, random_state=42, degree=1):
         self.learning_rate = learning_rate
         self.random_state = random_state
         np.random.seed(self.random_state)
@@ -162,7 +175,7 @@ class MultivariateRegression:
         self.y = None
         self.a = None           # (a0, a1, ..., ap)^T, a0 in place of b in model
         self.C = []
-        self.degree = degree    # currently only handles quadratic
+        self.degree = degree    # handles polynomial regression
 
     def gradient(self, iter):
         n = len(self.X_norm)
@@ -193,8 +206,11 @@ class MultivariateRegression:
         X_copy = X.copy()
         self.X = X_copy.values
 
-        if self.degree == 2:
-            self.X = np.append(X_copy.values, X_copy.values ** 2, axis=1)
+        # concatenate all necessary x before normalizing
+        if self.degree >= 2:
+            degrees = np.arange(2, (self.degree + 1), 1)
+            for d in degrees:
+                self.X = np.append(self.X, X_copy.values ** d, axis=1)
 
         # normalize x to x_norm and add bias term to input x_norm
         self.X_norm = normalize(self.X, 'multivariate')
@@ -203,7 +219,7 @@ class MultivariateRegression:
         self.X_norm = np.append([[1.]] * (len(self.X_norm)), self.X_norm, axis=1)
         self.y = y
 
-        # (p + 1) here contains all parameters (9 for linear and 17 for quadratic)
+        # (p + 1) here contains all parameters
         self.a = np.array([0] * (p + 1))
         self.C.append(0)
 
@@ -226,6 +242,7 @@ class MultivariateRegression:
                 self.C.append(new_C)
                 self.a = new_a
 
+    # MSE after training
     def MSE(self):
         n = len(self.y)
         mse = np.sum((self.y - np.dot(self.a, np.transpose(self.X_norm))) ** 2) / n
@@ -233,17 +250,24 @@ class MultivariateRegression:
 
     def test(self, X_test):
         X_test_copy = X_test.copy()
-        if self.degree == 2:
-            X_test_copy = np.append(X_test_copy.values, X_test_copy.values ** 2, axis=1)
-        X_test_norm = normalize(X_test_copy, 'multivariate')
+        X_test_ = X_test_copy
+
+        if self.degree >= 2:
+            degrees = np.arange(2, self.degree + 1, 1)
+            for d in degrees:
+                X_test_ = np.append(X_test_, X_test_copy.values ** d, axis=1)
+
+        X_test_norm = normalize(X_test_, 'multivariate')
         X_test_norm = np.append([[1.]] * (len(X_test_norm)), X_test_norm, axis=1)
         return np.dot(self.a, np.transpose(X_test_norm))
 
     def info(self, y_pred, y_true):
-        if self.degree == 2:
+        if self.degree == 1:
+            print("############ Multivariate linear regression for all features ################")
+        elif self.degree == 2:
             print("############ Multivariate quadratic regression for all features ################")
         else:
-            print("############ Multivariate linear regression for all features ################")
+            print("############ Multivariate polynomial of degree", self.degree, "regression for all features ################")
         print("Max iterations:", self.max_iteration)
         print("Learning rate:", self.learning_rate)
         print("MSE training:", self.MSE())

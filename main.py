@@ -42,10 +42,10 @@ if __name__ == '__main__':
     model7 = UnivariateFeature(X_train, y_train, X_test, y_test, col=6, learning_rate=0.1, max_iteration=100)
     model8 = UnivariateFeature(X_train, y_train, X_test, y_test, col=7, learning_rate=0.1, max_iteration=100)
 
-    # group of 3 plots for univariate regression of corresponding model obtained above
-    UnivariateRegression.subplot(model1, model2, model3, features=X.columns[0:3], target=dataset.columns[-1])
-    UnivariateRegression.subplot(model4, model5, model6, features=X.columns[3:6], target=dataset.columns[-1])
-    UnivariateRegression.subplot(model7, model8, features=X.columns[6:], target=dataset.columns[-1])
+    # uncomment the 3 lines below for group of 3 plots for univariate regression of corresponding model obtained above
+    # UnivariateRegression.subplot(model1, model2, model3, features=X.columns[0:3], target=dataset.columns[-1])
+    # UnivariateRegression.subplot(model4, model5, model6, features=X.columns[3:6], target=dataset.columns[-1])
+    # UnivariateRegression.subplot(model7, model8, features=X.columns[6:], target=dataset.columns[-1])
 
     '''
     Multivariate regression for all features of Concrete Data
@@ -98,4 +98,12 @@ if __name__ == '__main__':
     print("Model 9:", regression.MSE_test(model9.test(X_test), y_test))
     print("Model 10:", regression.MSE_test(model10.test(X_test), y_test))
     print("############ ------------------------------------------ ################\n")
+
+    # closed form solution for multivariate linear regression model
+    closed_form_params, closed_form_mse_train, closed_form_mse_test = regression.closed_form(X_train, y_train, X_test, y_test)
+    print("############ Closed form solution ################")
+    print("a =", closed_form_params)
+    print("MSE training:", closed_form_mse_train)
+    print("MSE testing:", closed_form_mse_test)
+    print("############ -------------------- ################\n")
 
